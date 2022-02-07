@@ -2,11 +2,11 @@ import { styled } from "@material-ui/system";
 import { TextField } from "@material-ui/core";
 
 export const TextFieldStyled = styled(TextField)`
-    .MuiInputBase-root{
-        background-color: ${({ theme }) => theme.palette.grey[50]};
-    }
+  .MuiInputBase-root {
+    background-color: ${({ theme }) => theme.palette.grey[50]};
+  }
 
-    .MuiOutLinedInput-notchedOutLine {
-        borde-color: ${({ theme }) => theme.palette.grey[100]};
-    }
+  .MuiOutLinedInput-notchedOutLine {
+    border-color: ${({ theme }) => theme.palette.grey[100]};
+  }
 `;
