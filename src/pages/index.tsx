@@ -2,14 +2,32 @@ import SafeEnviroment from "ui/components/feedback/safeEnviroment/SafeEnviroment
 import PageTitle from "ui/components/data-display/PageTitle/PageTitle";
 import UserInformation from "ui/components/data-display/UserInformation/UserInformation";
 import TextFieldMask from "ui/components/inputs/TextFieldMask/TextFieldMask";
-import { Button, Typography } from "@material-ui/core";
+import {
+  Button,
+  Container,
+  Typography,
+  CircularProgress,
+} from "@material-ui/core";
 import { FormElementsContainer } from "@styles/index.style";
 import {
   ProfissionaisPaper,
   ProfissionaisContainer,
 } from "@styles/index.style";
+import { useIndex } from "data/hooks/pages/useIndex.page";
+import { typography } from "@material-ui/system";
 
 export default function Home() {
+  const {
+    cep,
+    setCep,
+    cepValido,
+    buscarProfissionais,
+    erro,
+    diaristas,
+    buscaFeita,
+    carregando,
+    diaristasRestantes,
+  } = useIndex();
   return (
     <div>
       <SafeEnviroment />
@@ -19,68 +37,75 @@ export default function Home() {
           "Preencha seu endereço e conheça todos os profissionais da sua localidade"
         }
       />
+
       <FormElementsContainer>
         <TextFieldMask
           mask={"99.999-999"}
           label={"Digite seu CEP"}
           fullWidth
           variant={"outlined"}
+          value={cep}
+          onChange={(event) => setCep(event.target.value)}
         />
-        <Typography color={"error"}>CEP Inválido</Typography>
+
+        {erro && <Typography color={"error"}>{erro}</Typography>}
+
         <Button
           variant={"contained"}
           color={"secondary"}
           sx={{ width: "220px" }}
+          disabled={!cepValido || carregando}
+          onClick={() => buscarProfissionais(cep)}
         >
-          Buscar
+          {carregando ? <CircularProgress size={16} /> : "Buscar"}
         </Button>
       </FormElementsContainer>
 
-      <ProfissionaisPaper>
-        <ProfissionaisContainer>
-          <UserInformation
-            name={"Gabriel Yeiso"}
-            picture={"https://github.com/yeiso.png"}
-            rating={4}
-            description={"Americana"}
-          />
+      <Container>
+        {buscaFeita &&
+          !erro &&
+          (diaristas.length > 0 ? (
+            <ProfissionaisPaper>
+              <ProfissionaisContainer>
+                {diaristas.map((item, index) => {
+                  return (
+                    <UserInformation
+                      key={index}
+                      name={item.nome_completo}
+                      picture={item.foto_usuario}
+                      rating={item.reputacao}
+                      description={item.cidade}
+                    />
+                  );
+                })}
+              </ProfissionaisContainer>
 
-          <UserInformation
-            name={"Gabriel Yeiso"}
-            picture={"https://github.com/yeiso.png"}
-            rating={4}
-            description={"Americana"}
-          />
+              <Container sx={{ textAlign: "center" }}>
+                {diaristasRestantes > 0 && (
+                  <Typography sx={{ mt: 3 }}>
+                    ...e mais {diaristasRestantes}{" "}
+                    {diaristasRestantes > 1
+                      ? "profissionais atendem"
+                      : "profissional atende"}{" "}
+                    a sua região
+                  </Typography>
+                )}
 
-          <UserInformation
-            name={"Gabriel Yeiso"}
-            picture={"https://github.com/yeiso.png"}
-            rating={4}
-            description={"Americana"}
-          />
-
-          <UserInformation
-            name={"Gabriel Yeiso"}
-            picture={"https://github.com/yeiso.png"}
-            rating={4}
-            description={"Americana"}
-          />
-
-          <UserInformation
-            name={"Gabriel Yeiso"}
-            picture={"https://github.com/yeiso.png"}
-            rating={4}
-            description={"Americana"}
-          />
-
-          <UserInformation
-            name={"Gabriel Yeiso"}
-            picture={"https://github.com/yeiso.png"}
-            rating={4}
-            description={"Americana"}
-          />
-        </ProfissionaisContainer>
-      </ProfissionaisPaper>
+                <Button
+                  variant={"contained"}
+                  color={"secondary"}
+                  sx={{ mt: 5 }}
+                >
+                  Contratar um profissional
+                </Button>
+              </Container>
+            </ProfissionaisPaper>
+          ) : (
+            <Typography align='center' color={"textPrimary"}>
+              Ainda não temos nenhuma diarista disponível em sua região.
+            </Typography>
+          ))}
+      </Container>
     </div>
   );
 }
